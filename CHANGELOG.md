@@ -1,5 +1,7 @@
 # Changelog
 
+## [Unreleased]
+
 ## [1.0.0]
 
 - Initial release: report tok/s plus input, output, cache read/write and total tokens after each agent run.
