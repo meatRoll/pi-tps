@@ -1,6 +1,6 @@
 {
 	"name": "pi-tps",
-	"version": "0.1.0",
+	"version": "1.0.0",
 	"description": "Pi extension: tokens per second and token usage after each agent run",
 	"keywords": [
 		"pi-package",
