@@ -1,0 +1,53 @@
+{
+	"name": "pi-tps",
+	"version": "0.1.0",
+	"description": "Pi extension: tokens per second and token usage after each agent run",
+	"keywords": [
+		"pi-package",
+		"pi-extension",
+		"pi",
+		"tok/s",
+		"tokens",
+		"usage"
+	],
+	"type": "module",
+	"license": "MIT",
+	"author": "meatRoll",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/meatRoll/pi-tps.git"
+	},
+	"homepage": "https://github.com/meatRoll/pi-tps#readme",
+	"bugs": {
+		"url": "https://github.com/meatRoll/pi-tps/issues"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"files": [
+		"tps.ts",
+		"stats.ts",
+		"README.md",
+		"CHANGELOG.md",
+		"LICENSE"
+	],
+	"pi": {
+		"extensions": [
+			"./tps.ts"
+		]
+	},
+	"scripts": {
+		"check": "tsc --noEmit",
+		"test": "node --test test/*.test.ts"
+	},
+	"peerDependencies": {
+		"@earendil-works/pi-ai": "*",
+		"@earendil-works/pi-coding-agent": "*"
+	},
+	"devDependencies": {
+		"@earendil-works/pi-ai": "1.5.2",
+		"@earendil-works/pi-coding-agent": "1.5.2",
+		"@types/node": "^22.0.0",
+		"typescript": "^5.9.3"
+	}
+}
