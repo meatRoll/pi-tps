@@ -38,6 +38,19 @@ npm run check # tsc --noEmit
 
 `stats.ts` holds the pure math and formatting; `tps.ts` only wires the pi events to it.
 
+## Releasing
+
+1. Add entries under `## [Unreleased]` in `CHANGELOG.md`.
+2. Run `npm run release -- 1.1.0` (or `./scripts/release.sh 1.1.0`).
+
+The script refuses to run on a dirty tree or off `main`, checks that `v1.1.0` does not exist yet, runs `npm test` and `npm run check`, bumps `package.json` and `package-lock.json`, promotes the Unreleased entries to `## [1.1.0] - <date>`, commits `chore: release v1.1.0`, tags it, pushes `main` and the tag, and creates the GitHub release from that changelog section.
+
+Options:
+
+- `--dry-run`: validate and print the plan, write nothing.
+- `--no-push`: stop after the local commit and tag.
+- `--skip-checks`: skip tests and typechecking.
+
 ## License
 
 MIT
