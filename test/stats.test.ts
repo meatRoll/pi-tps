@@ -1,6 +1,14 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { formatTpsSummary, type MessageLike, summarizeAgentRun, type UsageLike } from "../stats.ts";
+import {
+	addRun,
+	createTotals,
+	formatTpsSummary,
+	type MessageLike,
+	summarizeAgentRun,
+	summarizeTotals,
+	type UsageLike,
+} from "../stats.ts";
 
 const assistant = (usage: UsageLike): MessageLike => ({ role: "assistant", usage });
 
@@ -54,5 +62,52 @@ describe("formatTpsSummary", () => {
 			formatTpsSummary(summary),
 			"TPS 47.4 tok/s. out 431, in 1,722, cache r/w 235,264/0, total 237,417, 9.1s",
 		);
+	});
+});
+
+describe("turn totals", () => {
+	it("folds several runs into one number", () => {
+		const totals = createTotals();
+		addRun(totals, [assistant({ input: 800, output: 200, totalTokens: 1000 })], 4000);
+		addRun(totals, [assistant({ input: 900, output: 400, totalTokens: 1300 })], 6000);
+
+		const summary = summarizeTotals(totals);
+		assert.ok(summary);
+		assert.equal(summary.runs, 2);
+		assert.equal(summary.output, 600);
+		assert.equal(summary.input, 1700);
+		assert.equal(summary.elapsedSeconds, 10);
+		assert.equal(Math.round(summary.tps * 10) / 10, 60);
+	});
+
+	it("sums run time instead of wall clock, so waits between runs are not counted", () => {
+		const totals = createTotals();
+		addRun(totals, [assistant({ output: 100 })], 2000);
+		// A minute passes while an extension decides what to inject, then run two.
+		addRun(totals, [assistant({ output: 100 })], 2000);
+
+		const summary = summarizeTotals(totals);
+		assert.ok(summary);
+		assert.equal(summary.elapsedSeconds, 4);
+		assert.equal(summary.tps, 50);
+	});
+
+	it("reports nothing when the turn produced no output", () => {
+		const totals = createTotals();
+		addRun(totals, [assistant({ input: 500 })], 1000);
+		assert.equal(summarizeTotals(totals), undefined);
+	});
+
+	it("names the run count only when a turn took more than one", () => {
+		const single = createTotals();
+		addRun(single, [assistant({ output: 431, input: 1722, totalTokens: 237_417 })], 9100);
+		const one = summarizeTotals(single);
+		assert.ok(one);
+		assert.ok(!formatTpsSummary(one).includes("runs"));
+
+		addRun(single, [assistant({ output: 1 })], 100);
+		const two = summarizeTotals(single);
+		assert.ok(two);
+		assert.match(formatTpsSummary(two), /tok\/s \(2 runs\)/);
 	});
 });
